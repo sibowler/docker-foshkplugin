@@ -11,7 +11,7 @@ ENV PUID=$PUID
 ENV PGID=$PGID
 
 # Update package list and install necessary packages
-RUN apk add --no-cache wget unzip su-exec
+RUN apk add --no-cache wget unzip su-exec tail
 
 # Set the PYTHONPATH environment variable
 ENV PYTHONPATH=/usr/local/lib/python3.11/site-packages
@@ -51,7 +51,15 @@ if [ -n "${PUID}" ] && [ "${PUID}" != "$(id -u foshk)" ]; then
   sed -i -e "s/^foshk:\([^:]*\):\([0-9]*\):[0-9]*/foshk:\1:${PUID}:\2/" /etc/passwd
 fi
 chown -R foshk:foshk /opt/foshkplugin
-exec su-exec foshk python3 foshkplugin.py
+
+# Create logs directory
+mkdir -p /opt/foshkplugin/logs
+chown -R foshk:foshk /opt/foshkplugin/logs
+
+# Start FOSHKplugin and tail both log files to stdout
+su-exec foshk sh -c 'python3 foshkplugin.py &
+sleep 2
+tail -f /opt/foshkplugin/logs/snd-foshkplugin.log /opt/foshkplugin/logs/log-foshkplugin.log 2>/dev/null'
 EOF
 RUN chmod +x entrypoint.sh
 
