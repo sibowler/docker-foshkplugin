@@ -11,7 +11,7 @@ ENV PUID=$PUID
 ENV PGID=$PGID
 
 # Update package list and install necessary packages
-RUN apk add --no-cache wget unzip su-exec tail
+RUN apk add --no-cache wget unzip su-exec
 
 # Set the PYTHONPATH environment variable
 ENV PYTHONPATH=/usr/local/lib/python3.11/site-packages
